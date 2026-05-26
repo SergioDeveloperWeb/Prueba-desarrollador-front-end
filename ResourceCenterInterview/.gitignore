@@ -29,3 +29,7 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Local interview tools
+dart-sass/
+dotnet-install.sh

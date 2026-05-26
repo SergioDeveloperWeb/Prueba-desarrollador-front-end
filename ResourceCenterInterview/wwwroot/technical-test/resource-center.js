@@ -3,8 +3,8 @@
 
     var state = {
         resources: Array.isArray(window.resourceCenterData) ? window.resourceCenterData : [],
-        searchText: "",
-        category: "all"
+        searchText: sessionStorage.getItem("rc_search_text") || "",
+        category: sessionStorage.getItem("rc_category") || "all"
     };
 
     var selectors = {
@@ -25,7 +25,7 @@
     }
 
     function escapeHtml(text) {
-        return (text || "")
+        return String(text || "")
             .replace(/&/g, "&amp;")
             .replace(/</g, "&lt;")
             .replace(/>/g, "&gt;")
@@ -40,11 +40,20 @@
         // TODO CANDIDATO 1:
         // Completar filtro por texto en titulo/resumen y mantener filtro por categoria.
         return state.resources.filter(function (item) {
-            if (category !== "all" && normalize(item.category) === category) {
+            // Corregido: Filtrar por categoría excluyendo las que no coinciden
+            if (category !== "all" && normalize(item.category) !== category) {
                 return false;
             }
 
-            // Falta filtro por texto (intencionado)
+            // Corregido: Buscar por texto en título y resumen
+            if (text !== "") {
+                var title = normalize(item.title);
+                var summary = normalize(item.summary || "");
+                if (title.indexOf(text) === -1 && summary.indexOf(text) === -1) {
+                    return false;
+                }
+            }
+
             return true;
         });
     }
@@ -60,7 +69,7 @@
             '<p class="tt-card__category">', category, '</p>',
             '<h3 class="tt-card__title">', title, '</h3>',
             '<p class="tt-card__summary">', summary, '</p>',
-            '<button type="button" class="tt-card__open js-open-resource" data-id="', id, '">Ver detalle</button>',
+            '<button type="button" class="tt-card__open js-open-resource" data-id="', id, '" aria-label="Ver detalles de: ', title, '">Ver detalle</button>',
             '</article>'
         ].join("");
     }
@@ -70,7 +79,8 @@
         var html = data.map(cardHtml).join("");
 
         $(selectors.grid).html(html);
-        $(selectors.total).text(state.resources.length);
+        // Corregido: Mostrar la cantidad de resultados filtrados
+        $(selectors.total).text(data.length);
         $(selectors.empty).prop("hidden", data.length > 0);
     }
 
@@ -95,20 +105,28 @@
     }
 
     function wireEvents() {
-        $(selectors.search).on("input", function () {
+        $(selectors.search).on("input keyup paste change", function () {
             state.searchText = $(this).val();
+            sessionStorage.setItem("rc_search_text", state.searchText);
             render();
         });
 
         $(selectors.category).on("change", function () {
             state.category = $(this).val();
+            sessionStorage.setItem("rc_category", state.category);
             render();
         });
 
         // TODO CANDIDATO 2:
         // Implementar boton limpiar para resetear filtros y volver a pintar.
         $(selectors.clear).on("click", function () {
-            // Intencionadamente incompleto
+            state.searchText = "";
+            state.category = "all";
+            sessionStorage.removeItem("rc_search_text");
+            sessionStorage.removeItem("rc_category");
+            $(selectors.search).val("");
+            $(selectors.category).val("all");
+            render();
         });
 
         $(document).on("click", ".js-open-resource", function () {
@@ -119,12 +137,23 @@
 
         // TODO CANDIDATO 3:
         // Cerrar modal con tecla Escape.
+        $(document).on("keydown", function (e) {
+            if (e.key === "Escape" || e.keyCode === 27) {
+                closeModal();
+            }
+        });
     }
 
     function init() {
+        // Sincronizar campos visuales con el estado cargado de sessionStorage
+        $(selectors.search).val(state.searchText);
+        $(selectors.category).val(state.category);
+
         wireEvents();
         render();
     }
 
-    init();
+    $(function () {
+        init();
+    });
 })(jQuery);

@@ -25,9 +25,17 @@ Para restaurar las dependencias del servidor ASP.NET Core utilizando el SDK loca
 ~/.dotnet/dotnet restore --configfile NuGet.config
 ```
 
-### Paso 2: Compilar SCSS a CSS (Hojas de Estilo)
-Dado que el entorno no tiene `npm` instalado de forma global, se ha integrado un compilador nativo y portable de **Dart Sass** (`v1.77.2`) directamente en el proyecto. 
+### Paso 2: Descargar Compilador SCSS e Instalar Dependencias Frontend
+El compilador de Sass no está incluido en el repositorio. Descarga el compilador nativo y portable de **Dart Sass** ejecutando desde la carpeta `ResourceCenterInterview`:
 
+```bash
+# Descargar y extraer Dart Sass (Linux x64)
+curl -sL https://github.com/sass/dart-sass/releases/download/1.77.2/dart-sass-1.77.2-linux-x64.tar.gz -o dart-sass.tar.gz && tar -xzf dart-sass.tar.gz && rm dart-sass.tar.gz
+```
+
+> 💡 **Alternativa (si tienes npm instalado):** Puedes usar `npm install` y luego `npm run scss:build` en lugar de los pasos anteriores.
+
+### Paso 3: Compilar SCSS a CSS (Hojas de Estilo)
 Para compilar el archivo SCSS principal en su hoja de estilos CSS correspondiente, ejecuta:
 
 ```bash
@@ -40,7 +48,7 @@ Para compilar el archivo SCSS principal en su hoja de estilos CSS correspondient
 > ./dart-sass/sass --watch wwwroot/technical-test/resource-center.scss:wwwroot/technical-test/resource-center.css
 > ```
 
-### Paso 3: Levantar el Servidor de Aplicación
+### Paso 4: Levantar el Servidor de Aplicación
 Para ejecutar el servidor web local bajo el perfil HTTP de desarrollo, ejecuta:
 
 ```bash
@@ -48,7 +56,7 @@ Para ejecutar el servidor web local bajo el perfil HTTP de desarrollo, ejecuta:
 ~/.dotnet/dotnet run --launch-profile http
 ```
 
-### Paso 4: Visualizar en el Navegador
+### Paso 5: Visualizar en el Navegador
 Una vez que la consola muestre el mensaje `Now listening on: http://localhost:5087`, abre tu navegador e ingresa a la siguiente URL para probar la aplicación interactiva:
 
 👉 **[http://localhost:5087/TechnicalTest/ResourceCenter](http://localhost:5087/TechnicalTest/ResourceCenter)**

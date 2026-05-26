@@ -13,51 +13,74 @@ El entorno ha sido completamente estabilizado y cuenta con todos los ejecutables
 
 ---
 
-## Guía de Arranque Paso a Paso (Foolproof)
+## Guía de Arranque Paso a Paso
 
-Sigue estos pasos en secuencia para inicializar y ejecutar el proyecto de forma local:
+Elige el método que mejor se adapte a tu entorno de desarrollo:
 
-### Paso 1: Restaurar Paquetes de .NET
-Para restaurar las dependencias del servidor ASP.NET Core utilizando el SDK local de .NET 8.0, ejecuta desde la carpeta `ResourceCenterInterview`:
+### Opción A: Método Estándar (Recomendado - Windows, macOS y Linux)
+Utiliza este método si tienes instalados de forma global el **SDK de .NET** y **Node.js/npm**.
 
-```bash
-# Restauración utilizando el ejecutable local
-~/.dotnet/dotnet restore --configfile NuGet.config
-```
+1. **Restaurar dependencias del servidor:**
+   Desde la carpeta `ResourceCenterInterview`, ejecuta:
+   ```bash
+   dotnet restore
+   ```
 
-### Paso 2: Descargar Compilador SCSS e Instalar Dependencias Frontend
-El compilador de Sass no está incluido en el repositorio. Descarga el compilador nativo y portable de **Dart Sass** ejecutando desde la carpeta `ResourceCenterInterview`:
+2. **Instalar compilador Sass y compilar estilos:**
+   Instala las dependencias de desarrollo y compila el archivo SCSS a CSS:
+   ```bash
+   # Instalar dependencias
+   npm install
 
-```bash
-# Descargar y extraer Dart Sass (Linux x64)
-curl -sL https://github.com/sass/dart-sass/releases/download/1.77.2/dart-sass-1.77.2-linux-x64.tar.gz -o dart-sass.tar.gz && tar -xzf dart-sass.tar.gz && rm dart-sass.tar.gz
-```
+   # Compilar una única vez
+   npm run scss:build
 
-> 💡 **Alternativa (si tienes npm instalado):** Puedes usar `npm install` y luego `npm run scss:build` en lugar de los pasos anteriores.
+   # (Opcional) Compilar en caliente durante el desarrollo
+   npm run scss:watch
+   ```
 
-### Paso 3: Compilar SCSS a CSS (Hojas de Estilo)
-Para compilar el archivo SCSS principal en su hoja de estilos CSS correspondiente, ejecuta:
+3. **Ejecutar el servidor:**
+   Inicia la aplicación bajo el perfil HTTP de desarrollo:
+   ```bash
+   dotnet run --launch-profile http
+   ```
 
-```bash
-# Compilar SCSS a CSS una única vez
-./dart-sass/sass --no-source-map wwwroot/technical-test/resource-center.scss wwwroot/technical-test/resource-center.css
-```
+---
 
-> 💡 **Nota (Modo Observador):** Si deseas realizar modificaciones estéticas y que se compilen automáticamente en caliente al guardar, puedes ejecutar:
-> ```bash
-> ./dart-sass/sass --watch wwwroot/technical-test/resource-center.scss:wwwroot/technical-test/resource-center.css
-> ```
+### Opción B: Método Portable (Solo Linux / Sin dependencias globales)
+Utiliza este método si estás en un entorno Linux sin `npm` ni el SDK de `.NET` instalado de forma global (usando las herramientas portables locales del proyecto).
 
-### Paso 4: Levantar el Servidor de Aplicación
-Para ejecutar el servidor web local bajo el perfil HTTP de desarrollo, ejecuta:
+1. **Restaurar dependencias del servidor:**
+   Utiliza el SDK de .NET instalado localmente:
+   ```bash
+   ~/.dotnet/dotnet restore --configfile NuGet.config
+   ```
 
-```bash
-# Iniciar el servidor web
-~/.dotnet/dotnet run --launch-profile http
-```
+2. **Descargar e instalar compilador Sass:**
+   Descarga y extrae el compilador nativo y portable de **Dart Sass** (`v1.77.2`):
+   ```bash
+   curl -sL https://github.com/sass/dart-sass/releases/download/1.77.2/dart-sass-1.77.2-linux-x64.tar.gz -o dart-sass.tar.gz && tar -xzf dart-sass.tar.gz && rm dart-sass.tar.gz
+   ```
 
-### Paso 5: Visualizar en el Navegador
-Una vez que la consola muestre el mensaje `Now listening on: http://localhost:5087`, abre tu navegador e ingresa a la siguiente URL para probar la aplicación interactiva:
+3. **Compilar SCSS a CSS:**
+   Compila el archivo de estilos:
+   ```bash
+   # Compilar una única vez
+   ./dart-sass/sass --no-source-map wwwroot/technical-test/resource-center.scss wwwroot/technical-test/resource-center.css
+
+   # (Opcional) Compilar en caliente durante el desarrollo
+   ./dart-sass/sass --watch wwwroot/technical-test/resource-center.scss:wwwroot/technical-test/resource-center.css
+   ```
+
+4. **Ejecutar el servidor:**
+   ```bash
+   ~/.dotnet/dotnet run --launch-profile http
+   ```
+
+---
+
+### Visualización en el Navegador
+Una vez que el servidor esté activo (por cualquiera de los dos métodos), abre tu navegador en:
 
 👉 **[http://localhost:5087/TechnicalTest/ResourceCenter](http://localhost:5087/TechnicalTest/ResourceCenter)**
 
